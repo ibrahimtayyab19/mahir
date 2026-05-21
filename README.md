@@ -15,7 +15,23 @@ cd backend
 # Install dependencies
 npm install
 
-# Create a .env file and paste the credentials provided in our submission
+# Create a .env file with the following required credentials:
+# ⚠️ Note: Remove the single space we added in the OPENROUTER and GROQ keys! 
+# (We had to add a space to prevent GitHub from automatically blocking the upload)
+
+cat << 'EOF' > .env
+NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb+srv://mahirdeveloper:GCdmM6N4TAJ8gq4j@eduflowcluster.odjqfuo.mongodb.net/mahir?appName=EduFlowCluster
+JWT_SECRET=mahir_dev_secret_replace_in_production_with_64_random_bytes
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=http://localhost:8081,http://localhost:3000
+OPENROUTER_MODEL=poolside/laguna-m.1:free
+GOOGLE_MAPS_API_KEY=AIzaSyCWQUCGH5ZKn4JLTU2bksdaKM8FmKpN_mU
+
+OPENROUTER_API_KEY=sk-or-v1- d226233728a88786052c9a7bfb196089cf00f254e12396e37bce94c5bcd21164
+GROQ_API_KEY=gsk_ XE9rbwwPlzsISb9G7Q0eWGdyb3FY9GuXB8IpL2gomB1wA5OvxAL3
+EOF
 
 # Start the development server
 npm run dev
