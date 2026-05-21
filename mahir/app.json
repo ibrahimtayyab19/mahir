@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "mahir",
+    "slug": "mahir",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "mahir",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F9FAF2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mahir.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F9FAF2",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.mahir.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "69017c0a-da1f-4a96-aaeb-68111521e846"
+      }
+    }
+  }
+}
