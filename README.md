@@ -17,7 +17,7 @@ npm install
 # Start the development server
 npm run dev
 ```
-*(Note: The required `.env` file containing the MongoDB URI and API keys is already included in the repository for your convenience.)*
+*(Note: The required `.env` file containing the MongoDB URI and API keys is already included in the repository for your convenience. **Disclaimer:** We are fully aware that committing `.env` files and API keys to source control is against security best practices, but we have included them here intentionally to make the local demo testing process as seamless as possible for the judges!)*
 *The backend will start running on `http://localhost:3000`.*
 
 ### 2. Start the Frontend App
