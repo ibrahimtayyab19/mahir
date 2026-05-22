@@ -10,6 +10,7 @@ import {
   uploadPhoto,
   getEarnings,
   getProviderMessages,
+  chatWithAgent,
 } from "../controllers/provider.controller";
 import { authenticate, authorize } from "../middleware/auth.middleware";
 
@@ -67,5 +68,10 @@ router.get("/earnings", getEarnings);
 
 /** GET /api/provider/messages — Conversation list (§8) */
 router.get("/messages", getProviderMessages);
+
+// ─── AI Agent ─────────────────────────────────────────────────────────────────
+
+/** POST /api/provider/chat — Conversational agent */
+router.post("/chat", chatWithAgent);
 
 export default router;

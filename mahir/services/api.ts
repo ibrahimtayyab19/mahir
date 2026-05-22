@@ -46,7 +46,11 @@ apiClient.interceptors.response.use(
           AsyncStorage.removeItem("mahir_role"),
         ]);
       } catch { /* ignore */ }
-      router.replace("/(auth)/login");
+
+      // Skip redirect if the error came from the login request itself
+      if (!error.config?.url?.includes("/api/auth/login")) {
+        router.replace("/(auth)/login");
+      }
       return Promise.reject(error);
     }
 

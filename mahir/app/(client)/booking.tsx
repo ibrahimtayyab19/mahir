@@ -260,7 +260,7 @@ export default function BookingScreen() {
         {/* Done Button */}
         <Pressable
           style={styles.doneButton}
-          onPress={() => router.replace("/(client)/jobs")}
+          onPress={() => router.replace("/(client)/")}
           accessibilityRole="button"
         >
           <Text style={styles.doneButtonText}>Done</Text>

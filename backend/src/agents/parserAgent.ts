@@ -46,6 +46,7 @@ RULES:
 - Extract budget sensitivity from phrases like "zyada nahi hai" or "budget tight hai" → "price-conscious".
 - Generate job posts in two languages: english and romanUrdu (latin script).
 - Map service types to one of: ["AC Technician", "Plumber", "Electrician", "Carpenter", "Painter", "Cleaner", "Driver", "Cook", "Security Guard", "IT Support", "Other"].
+- If you ask a clarification question, it MUST be in the exact SAME language the user used (e.g. if the user speaks Roman Urdu, the question must be in Roman Urdu).
 
 EXAMPLES:
 "AC bilkul kaam nahi kar raha" → serviceType must be "AC Technician"
@@ -113,13 +114,19 @@ export async function run(rawInput: string): Promise<ParserOutput> {
 
   try {
     const parsed = JSON.parse(rawJson);
-    
-    // Normalize missing or null values from LLM
-    if (!parsed.location) parsed.location = { area: "Unknown", city: "Unknown" };
-    if (parsed.location.area === null || parsed.location.area === undefined) parsed.location.area = "Unknown";
-    if (parsed.location.city === null || parsed.location.city === undefined) parsed.location.city = "Unknown";
-    if (parsed.preferredTime === null || parsed.preferredTime === undefined) parsed.preferredTime = "As soon as possible";
-    if (parsed.serviceType === null || parsed.serviceType === undefined) parsed.serviceType = "Other";
+
+    // LLM might return null for fields if intent is completely unknown (e.g. "Hello").
+    // We sanitize these to default strings to pass the strict type guard.
+    if (parsed.serviceType === null) parsed.serviceType = "Other";
+    if (parsed.preferredTime === null) parsed.preferredTime = "Not specified";
+    if (parsed.location) {
+      if (parsed.location.area === null) parsed.location.area = "Unknown";
+      if (parsed.location.city === null) parsed.location.city = "Unknown";
+    }
+    if (parsed.jobPost) {
+      if (parsed.jobPost.english === null) parsed.jobPost.english = "";
+      if (parsed.jobPost.romanUrdu === null) parsed.jobPost.romanUrdu = "";
+    }
     
     if (!isParserOutput(parsed)) {
       throw new Error("Schema mismatch");

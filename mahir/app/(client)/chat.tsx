@@ -178,7 +178,7 @@ export default function ChatScreen() {
 
   return (
 
-      <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
             <ArrowLeft size={24} color={Colors.onSurface} />
@@ -195,7 +195,8 @@ export default function ChatScreen() {
 
         <KeyboardAvoidingView
           style={styles.flex1}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior="padding"
+          keyboardVerticalOffset={Platform.OS === "ios" ? 110 : 0}
         >
           <FlatList
             ref={flatListRef}

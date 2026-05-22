@@ -105,6 +105,39 @@ export class MahirOrchestrator {
         outputTokens: 0,
       });
 
+      // ── Step 1.5: Clarification Check ──────────────────────────────────────
+      if (parsedIntent.clarificationNeeded && parsedIntent.clarificationQuestion) {
+        console.log(`[AGENT LOG] ⚠️ Clarification needed: ${parsedIntent.clarificationQuestion}`);
+        
+        await AgentLog.create({
+          sessionId,
+          orchestratorPlan,
+          agents: agentTraces,
+          totalLatencyMs: parserLatency,
+          fallbackTriggered: true,
+          fallbackReason: "Clarification Needed",
+          finalOutcome: "Waiting for user clarification",
+        });
+
+        return {
+          sessionId,
+          jobPostId: null,
+          parserOutput: parsedIntent,
+          matchmakerOutput: {
+            matches: [],
+            totalSearched: 0,
+            searchRadiusKm: 0,
+            fallback: {
+              reason: parsedIntent.clarificationQuestion,
+              suggestion: "Please reply with more details so I can find the best person for the job.",
+            },
+            reasoning: "Clarification required from client.",
+          },
+          jobPost: null,
+          agentTraces,
+        };
+      }
+
       // ── Step 2: MongoDB $geoNear — find nearby active providers ───────────
       let providers = await this._queryNearbyProviders(
         clientLocation,
@@ -180,9 +213,17 @@ export class MahirOrchestrator {
         })
         .filter((id): id is Types.ObjectId => id !== null);
 
-      const safeTitle = parsedIntent.jobPost.english.length > 110 
-        ? parsedIntent.jobPost.english.substring(0, 110) + "..." 
-        : parsedIntent.jobPost.english;
+      let englishDesc = parsedIntent.jobPost?.english || rawMessage;
+      if (!englishDesc || englishDesc.trim().length === 0) englishDesc = "Client requested a service.";
+
+      let safeTitle = englishDesc.trim();
+      if (safeTitle.length < 5) {
+        safeTitle = (safeTitle + " Task").trim();
+        if (safeTitle.length < 5) safeTitle = "Service Request";
+      }
+      if (safeTitle.length > 110) {
+        safeTitle = safeTitle.substring(0, 110) + "...";
+      }
 
       const jobPost = await JobPost.create({
         clientId: new Types.ObjectId(clientId),
@@ -190,12 +231,12 @@ export class MahirOrchestrator {
         category: parsedIntent.serviceType,
         serviceType: parsedIntent.serviceType,
         rawInput: rawMessage,
-        descriptionEN: parsedIntent.jobPost.english,
+        descriptionEN: englishDesc,
         descriptionUR: "",
-        descriptionRU: parsedIntent.jobPost.romanUrdu,
-        urgency: parsedIntent.urgency,
-        preferredTime: parsedIntent.preferredTime,
-        description: parsedIntent.jobPost.english,
+        descriptionRU: parsedIntent.jobPost?.romanUrdu || "",
+        urgency: parsedIntent.urgency || "medium",
+        preferredTime: parsedIntent.preferredTime || "As soon as possible",
+        description: englishDesc,
         budgetMinPKR: 0,
         budgetMaxPKR: 50000,
         location: {
@@ -299,7 +340,6 @@ export class MahirOrchestrator {
       clarificationQuestion: null,
       jobPost: {
         english: jobPost.descriptionEN ?? jobPost.title,
-        urdu: jobPost.descriptionUR ?? "",
         romanUrdu: jobPost.descriptionRU ?? "",
       },
       reasoning: "Sequential orchestration: Quoter running after provider selection.",

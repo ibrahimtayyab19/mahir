@@ -36,6 +36,7 @@ echo "EXPO_PUBLIC_SOCKET_URL=http://localhost:3000" >> .env
 # Start the Expo server
 npx expo start
 ```
+> **⚠️ IMPORTANT NOTE FOR PHYSICAL DEVICES:** If you plan to test the app using the **Expo Go app on a physical phone**, `localhost` will not work (as it refers to the phone itself). You must replace `localhost` in the `mahir/.env` file with your computer's local Wi-Fi IP address (e.g., `http://192.168.1.5:3000`) and restart the Expo server with `npx expo start -c`.
 *You can now press `w` to open the app in your web browser, or use the Expo Go app on your phone to scan the QR code.*
 
 ## 🔑 Demo Accounts

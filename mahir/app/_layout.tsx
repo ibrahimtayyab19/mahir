@@ -7,6 +7,17 @@ import {
   Sora_600SemiBold,
   Sora_700Bold,
 } from "@expo-google-fonts/sora";
+import { LogBox } from "react-native";
+
+// Ignore benign expo-keep-awake unhandled promise rejections in Expo Go
+LogBox.ignoreLogs(["Unable to activate keep awake"]);
+const originalConsoleError = console.error;
+console.error = (...args: any[]) => {
+  if (args.length > 0 && String(args[0]).includes("Unable to activate keep awake")) {
+    return;
+  }
+  originalConsoleError(...args);
+};
 
 // Prevent splash screen from auto-hiding until fonts load
 SplashScreen.preventAutoHideAsync();

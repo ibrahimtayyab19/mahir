@@ -6,6 +6,7 @@ import Booking from "../models/Booking.model";
 import Message from "../models/Message.model";
 import { ApiError, asyncHandler } from "../middleware/error.middleware";
 import { getIo } from "../socket/socketHandlers";
+import * as providerAgent from "../agents/providerAgent";
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
 
@@ -154,7 +155,12 @@ export const getNearbyJobs = asyncHandler(
     }
 
     const geoQuery: Record<string, unknown> = { status: "open" };
-    if (category) geoQuery["category"] = { $regex: new RegExp(category, "i") };
+    if (category) {
+      geoQuery["$or"] = [
+        { category: { $regex: new RegExp(category, "i") } },
+        { category: "Other" }
+      ];
+    }
 
     const jobs = await JobPost.aggregate([
       {
@@ -453,5 +459,33 @@ export const getProviderMessages = asyncHandler(
     ]);
 
     res.status(200).json({ success: true, data: { bookings, conversations } });
+  }
+);
+
+// ─── AI Agent ─────────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/provider/chat
+ * Conversational AI agent for providers.
+ * Body: { message: string }
+ */
+export const chatWithAgent = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+    const { message } = req.body as { message?: string };
+
+    if (!message || message.trim().length === 0) {
+      throw new ApiError(400, "message is required");
+    }
+
+    const provider = await Provider.findOne({ userId }).lean();
+    if (!provider) throw new ApiError(404, "Provider profile not found");
+
+    const result = await providerAgent.run(
+      message.trim(),
+      provider.serviceCategory || "General Services"
+    );
+
+    res.status(200).json({ success: true, data: result });
   }
 );
